@@ -9,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +18,12 @@ public class PessoaResource {
 
     @Autowired
     private PessoaRepository pessoaRepository;
+
+
+    @GetMapping
+    public List<Pessoa> lista() {
+        return pessoaRepository.findAll();
+    }
 
     @PostMapping
     public ResponseEntity<Pessoa> criar(@Valid @RequestBody Pessoa pessoa) {
