@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -23,12 +24,12 @@ public class CategoriaResource {
     @GetMapping
     public ResponseEntity<?> listar() {
         List<Categoria> categorias = categoriaRepository.findAll();
-         return !categorias.isEmpty() ? ResponseEntity.ok(categorias) : ResponseEntity.noContent().build();
+        return !categorias.isEmpty() ? ResponseEntity.ok(categorias) : ResponseEntity.noContent().build();
     }
 
     @PostMapping
 //    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Categoria> criar(@RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria) {
         Categoria categoriaSalve = categoriaRepository.save(categoria);
         // create URI path to the created component in Headers Location
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
