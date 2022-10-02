@@ -1,8 +1,10 @@
 package com.moneyawapi.resource;
 
+import com.moneyawapi.event.ResourceCriadoEvent;
 import com.moneyawapi.model.Categoria;
 import com.moneyawapi.repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,9 @@ public class CategoriaResource {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     @GetMapping
     public ResponseEntity<?> listar() {
         List<Categoria> categorias = categoriaRepository.findAll();
@@ -29,12 +34,10 @@ public class CategoriaResource {
 
     @PostMapping
 //    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria) {
-        Categoria categoriaSalve = categoriaRepository.save(categoria);
-        // create URI path to the created component in Headers Location
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-                .buildAndExpand(categoriaSalve.getCodigo()).toUri();
-        return ResponseEntity.created(uri).body(categoriaSalve);
+    public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
+        Categoria categoriaSalva = categoriaRepository.save(categoria);
+        publisher.publishEvent(new ResourceCriadoEvent(this, response, categoriaSalva.getCodigo()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 
     }
 
