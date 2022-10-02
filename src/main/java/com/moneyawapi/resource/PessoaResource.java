@@ -3,6 +3,7 @@ package com.moneyawapi.resource;
 import com.moneyawapi.event.ResourceCriadoEvent;
 import com.moneyawapi.model.Pessoa;
 import com.moneyawapi.repository.PessoaRepository;
+import org.aspectj.weaver.patterns.PerObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,6 +45,12 @@ public class PessoaResource {
     public ResponseEntity<Pessoa> buscaPeloId(@PathVariable Long codigo) {
         Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
         return pessoa.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{codigo}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarPeloId(@PathVariable Long codigo) {
+        pessoaRepository.deleteById(codigo);
     }
 
 
