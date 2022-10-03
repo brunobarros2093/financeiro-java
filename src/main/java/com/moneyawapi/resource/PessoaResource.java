@@ -3,18 +3,15 @@ package com.moneyawapi.resource;
 import com.moneyawapi.event.ResourceCriadoEvent;
 import com.moneyawapi.model.Pessoa;
 import com.moneyawapi.repository.PessoaRepository;
-import org.aspectj.weaver.patterns.PerObject;
+import com.moneyawapi.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +21,10 @@ public class PessoaResource {
 
     @Autowired
     private PessoaRepository pessoaRepository;
+
+    @Autowired
+    private PessoaService pessoaService;
+
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -51,6 +52,12 @@ public class PessoaResource {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletarPeloId(@PathVariable Long codigo) {
         pessoaRepository.deleteById(codigo);
+    }
+
+    @PutMapping("/{codigo}")
+    public ResponseEntity<Pessoa> atualiza(@PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa) {
+        Pessoa pessoaSalva = pessoaService.atualizar(codigo, pessoa);
+        return ResponseEntity.ok(pessoaSalva);
     }
 
 
