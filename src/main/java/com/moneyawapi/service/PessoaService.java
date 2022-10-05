@@ -14,7 +14,7 @@ public class PessoaService {
     private PessoaRepository pessoaRepository;
 
     public Pessoa atualizar(Long codigo, Pessoa pessoa) {
-        Pessoa pessoaEncontrada = pessoaRepository.findById(codigo).orElseThrow(() -> new EmptyResultDataAccessException(1));
+        Pessoa pessoaEncontrada = getPessoaPorCodigo(codigo);
         BeanUtils.copyProperties(pessoa, pessoaEncontrada, "codigo");
         pessoaRepository.save(pessoaEncontrada);
         // TODO : set content-type for PATCH
@@ -23,4 +23,16 @@ public class PessoaService {
         return pessoaEncontrada;
     }
 
+    public void atualizarPropriedadeAtivo(Long codigo, Boolean ativo) {
+        Pessoa pessoaEncontrada = getPessoaPorCodigo(codigo);
+        pessoaEncontrada.setAtivo(ativo);
+        pessoaRepository.save(pessoaEncontrada);
+    }
+
+    private Pessoa getPessoaPorCodigo(Long codigo) {
+        return pessoaRepository.findById(codigo).orElseThrow(() -> new EmptyResultDataAccessException(1));
+    }
+
 }
+
+

@@ -30,7 +30,7 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String mensagem = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
-        String msgDev = ex.getCause().toString();
+        String msgDev = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
         List<Erro> erros = List.of(new Erro(mensagem, msgDev));
         return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
     }
