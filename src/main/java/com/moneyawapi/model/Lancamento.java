@@ -14,6 +14,7 @@ public class Lancamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
+    @NotNull
     private String descricao;
     @NotNull
     @Column(name = "data_vencimento")
