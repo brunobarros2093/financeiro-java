@@ -1,6 +1,7 @@
 package com.moneyawapi.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,9 +15,11 @@ public class Lancamento {
     private Long codigo;
 
     private String descricao;
+    @NotNull
     @Column(name = "data_vencimento")
     private LocalDate dataVencimento;
 
+    @NotNull
     @Column(name = "data_pagamento")
     private LocalDate dataPagamento;
     private BigDecimal valor;
@@ -25,14 +28,17 @@ public class Lancamento {
     @Enumerated(EnumType.STRING)
     private TipoLancamento tipo;
 
-    // uma categoria pode estar em varios lancamentos
+    // uma categoria pode estar em varios
+    // lancamentos
     @ManyToOne
     @JoinColumn(name = "codigo_categoria")
+    @NotNull
     private Categoria categoria;
 
     // uma pessoa pode estar em varios lancamentos
     @ManyToOne
     @JoinColumn(name = "codigo_pessoa")
+    @NotNull
     private Pessoa pessoa;
 
     public Long getCodigo() {

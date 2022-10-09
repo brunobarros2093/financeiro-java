@@ -1,5 +1,7 @@
 package com.moneyawapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -48,6 +50,14 @@ public class Pessoa {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    // anotações adicionadas para o hibernate nem o jackson serializarem o método
+    // utilizado devido a nomenclatura 'is'
+    @JsonIgnore
+    @Transient
+    public boolean isInativo() {
+        return !this.getAtivo();
     }
 
     @Override

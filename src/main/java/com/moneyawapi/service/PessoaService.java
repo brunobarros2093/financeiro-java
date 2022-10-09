@@ -29,7 +29,7 @@ public class PessoaService {
         pessoaRepository.save(pessoaEncontrada);
     }
 
-    private Pessoa getPessoaPorCodigo(Long codigo) {
+    public Pessoa getPessoaPorCodigo(Long codigo) {
         return pessoaRepository.findById(codigo).orElseThrow(() -> new EmptyResultDataAccessException(1));
     }
 
