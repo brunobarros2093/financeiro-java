@@ -4,6 +4,7 @@ import com.moneyawapi.event.ResourceCriadoEvent;
 import com.moneyawapi.exceptionhandler.GeneralExceptionHandler;
 import com.moneyawapi.model.Lancamento;
 import com.moneyawapi.repository.LancamentosRepository;
+import com.moneyawapi.repository.filter.LancamentoFilter;
 import com.moneyawapi.service.LancamentoService;
 import com.moneyawapi.service.exception.PessoaInexistenteOuInativaException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class LancamentoResource {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Lancamento> getAll() {
+    public List<Lancamento> pesquisar(LancamentoFilter lancamentoFilter) {
         return lancamentosRepository.findAll();
     }
 
