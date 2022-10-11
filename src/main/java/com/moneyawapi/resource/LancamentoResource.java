@@ -3,7 +3,7 @@ package com.moneyawapi.resource;
 import com.moneyawapi.event.ResourceCriadoEvent;
 import com.moneyawapi.exceptionhandler.GeneralExceptionHandler;
 import com.moneyawapi.model.Lancamento;
-import com.moneyawapi.repository.LancamentosRepository;
+import com.moneyawapi.repository.LancamentoRepository;
 import com.moneyawapi.repository.filter.LancamentoFilter;
 import com.moneyawapi.service.LancamentoService;
 import com.moneyawapi.service.exception.PessoaInexistenteOuInativaException;
@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,7 @@ import java.util.Optional;
 public class LancamentoResource {
 
     @Autowired
-    private LancamentosRepository lancamentosRepository;
+    private LancamentoRepository lancamentoRepository;
 
     @Autowired
     private MessageSource messageSource;
@@ -37,13 +39,13 @@ public class LancamentoResource {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Lancamento> pesquisar(LancamentoFilter lancamentoFilter) {
-        return lancamentosRepository.filtrar(lancamentoFilter);
+    public Page<Lancamento> pesquisar(LancamentoFilter lancamentoFilter, Pageable pageable) {
+        return lancamentoRepository.filtrar(lancamentoFilter, pageable);
     }
 
     @GetMapping("/{codigo}")
     public ResponseEntity<Lancamento> buscarPeloCodigo(@PathVariable Long codigo) {
-        Optional<Lancamento> lancamento = lancamentosRepository.findById(codigo);
+        Optional<Lancamento> lancamento = lancamentoRepository.findById(codigo);
         return lancamento.isPresent() ? ResponseEntity.ok(lancamento.get()) : ResponseEntity.notFound().build();
     }
 
@@ -57,7 +59,7 @@ public class LancamentoResource {
     @DeleteMapping("/{codigo}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long codigo) {
-        lancamentosRepository.deleteById(codigo);
+        lancamentoRepository.deleteById(codigo);
     }
 
 

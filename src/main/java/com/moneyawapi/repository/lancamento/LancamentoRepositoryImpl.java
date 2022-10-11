@@ -2,6 +2,9 @@ package com.moneyawapi.repository.lancamento;
 
 import com.moneyawapi.model.Lancamento;
 import com.moneyawapi.repository.filter.LancamentoFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.ObjectUtils;
 
 import javax.persistence.EntityManager;
@@ -20,7 +23,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
     private EntityManager manager;
 
     @Override
-    public List<Lancamento> filtrar(LancamentoFilter lancamentoFilter) {
+    public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
         CriteriaBuilder builder = manager.getCriteriaBuilder();
         CriteriaQuery<Lancamento> criteria = builder.createQuery(Lancamento.class);
         Root<Lancamento> root = criteria.from(Lancamento.class);
@@ -30,34 +33,50 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         criteria.where(predicates);
 
         TypedQuery<Lancamento> query = manager.createQuery(criteria);
-        return query.getResultList();
+        adicionarRestricoesDePaginacao(query, pageable);
+        return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter));
+    }
+
+    private Long total(LancamentoFilter lancamentoFilter) {
+        CriteriaBuilder builder = manager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+        Root<Lancamento> root = criteria.from(Lancamento.class);
+
+        Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+
+        criteria.where(predicates);
+        // da um count no total
+        criteria.select(builder.count(root));
+        return manager.createQuery(criteria).getSingleResult();
+    }
+
+    private void adicionarRestricoesDePaginacao(TypedQuery<Lancamento> query, Pageable pageable) {
+        int paginaAtual = pageable.getPageNumber();
+        int totalPorPagina = pageable.getPageSize();
+        int primerioRegistro = paginaAtual * totalPorPagina;
+        query.setFirstResult(primerioRegistro);
+        query.setMaxResults(totalPorPagina);
     }
 
     private Predicate[] criarRestricoes(LancamentoFilter lancamentoFilter, CriteriaBuilder builder, Root<Lancamento> root) {
 
-        List<Predicate> predicados = new ArrayList<>();
+        List<Predicate> predicates = new ArrayList<>();
 
-        if (ObjectUtils.isEmpty(lancamentoFilter.getDescricao())) {
-            predicados.add(builder.like(
-                    builder.lower(root.get("descricao")),
-                    "%" + lancamentoFilter.getDescricao().toLowerCase() + "%"
-            ));
+        if (!ObjectUtils.isEmpty(lancamentoFilter.getDescricao())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("descricao")), "%" + lancamentoFilter.getDescricao().toLowerCase() + "%"));
         }
 
-        if (ObjectUtils.isEmpty(lancamentoFilter.getDataVencimentoDe())) {
-            predicados.add(builder.greaterThanOrEqualTo(
-                    root.get("dataVencimento"),
-                    "%" + lancamentoFilter.getDataVencimentoDe() + "%"
-            ));
+        if (lancamentoFilter.getDataVencimentoDe() != null) {
+            predicates.add(
+                    builder.greaterThanOrEqualTo(root.get("dataVencimentoDe"), lancamentoFilter.getDataVencimentoDe()));
         }
 
-        if (ObjectUtils.isEmpty(lancamentoFilter.getDataVencimentoAte())) {
-            predicados.add(builder.lessThanOrEqualTo(
-                    root.get("dataVencimento"),
-                    "%" + lancamentoFilter.getDataVencimentoAte() + "%"
-            ));
+        if (lancamentoFilter.getDataVencimentoAte() != null) {
+            predicates.add(
+                    builder.lessThanOrEqualTo(root.get("dataVencimentoAte"), lancamentoFilter.getDataVencimentoAte()));
         }
 
-        return predicados.toArray(new Predicate[predicados.size()]);
+        return predicates.toArray(new Predicate[predicates.size()]);
     }
 }

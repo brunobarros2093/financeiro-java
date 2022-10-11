@@ -2,7 +2,7 @@ package com.moneyawapi.service;
 
 import com.moneyawapi.model.Lancamento;
 import com.moneyawapi.model.Pessoa;
-import com.moneyawapi.repository.LancamentosRepository;
+import com.moneyawapi.repository.LancamentoRepository;
 import com.moneyawapi.repository.PessoaRepository;
 import com.moneyawapi.service.exception.PessoaInexistenteOuInativaException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class LancamentoService {
 
     @Autowired
-    private LancamentosRepository lancamentosRepository;
+    private LancamentoRepository lancamentoRepository;
 
     @Autowired
     private PessoaRepository pessoaRespository;
@@ -24,7 +24,7 @@ public class LancamentoService {
             throw new PessoaInexistenteOuInativaException();
         }
 
-        return lancamentosRepository.save(lancamento);
+        return lancamentoRepository.save(lancamento);
 
     }
 }
