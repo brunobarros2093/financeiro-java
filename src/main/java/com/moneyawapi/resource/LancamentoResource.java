@@ -39,7 +39,7 @@ public class LancamentoResource {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<Lancamento> pesquisar(LancamentoFilter lancamentoFilter, Pageable pageable) {
+    public Page<Lancamento> pesquisar(@RequestParam(required = false) LancamentoFilter lancamentoFilter, Pageable pageable) {
         return lancamentoRepository.filtrar(lancamentoFilter, pageable);
     }
 
