@@ -25,6 +25,7 @@ public class CategoriaResource {
     private ApplicationEventPublisher publisher;
 
     @GetMapping
+    @CrossOrigin
     public ResponseEntity<?> listar() {
         List<Categoria> categorias = categoriaRepository.findAll();
         return !categorias.isEmpty() ? ResponseEntity.ok(categorias) : ResponseEntity.noContent().build();
