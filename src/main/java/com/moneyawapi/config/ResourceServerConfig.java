@@ -11,7 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -28,25 +29,19 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
 
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("admin").password("admin").roles("ROLE");
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests().antMatchers("/categorias")
-                .permitAll().anyRequest()
-                .authenticated().and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().csrf().disable().oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
+        http.authorizeHttpRequests().antMatchers("/categorias").permitAll().anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable().oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
 
     @Bean
@@ -69,9 +64,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
             JwtGrantedAuthoritiesConverter scopesAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
             Collection<GrantedAuthority> grantedAuthorities = scopesAuthoritiesConverter.convert(jwt);
 
-            grantedAuthorities.addAll(authorities.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList()));
+            grantedAuthorities.addAll(authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 
             return grantedAuthorities;
         });
@@ -83,4 +76,9 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }+
 }
