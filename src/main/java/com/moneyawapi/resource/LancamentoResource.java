@@ -5,6 +5,7 @@ import com.moneyawapi.exceptionhandler.GeneralExceptionHandler;
 import com.moneyawapi.model.Lancamento;
 import com.moneyawapi.repository.LancamentoRepository;
 import com.moneyawapi.repository.filter.LancamentoFilter;
+import com.moneyawapi.repository.projection.ResumoLancamento;
 import com.moneyawapi.service.LancamentoService;
 import com.moneyawapi.service.exception.PessoaInexistenteOuInativaException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,12 @@ public class LancamentoResource {
     @ResponseStatus(HttpStatus.OK)
     public Page<Lancamento> pesquisar(@RequestParam(required = false) LancamentoFilter lancamentoFilter, Pageable pageable) {
         return lancamentoRepository.filtrar(lancamentoFilter, pageable);
+    }
+
+    @GetMapping(params = "resumo")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<ResumoLancamento> resumir(@RequestParam(required = false) LancamentoFilter lancamentoFilter, Pageable pageable) {
+        return lancamentoRepository.resumir(lancamentoFilter, pageable);
     }
 
     @GetMapping("/{codigo}")
